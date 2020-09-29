@@ -15,6 +15,6 @@ export class User {
   @OneToMany(type => Task, task => task.user)
   tasks: Task[];
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'timestamp', select: false, default: () => 'CURRENT_TIMESTAMP' })
   createdAt: string;
 }

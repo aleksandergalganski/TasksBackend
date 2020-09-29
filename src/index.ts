@@ -1,21 +1,32 @@
-import "reflect-metadata";
-import {createConnection} from "typeorm";
-import {User} from "./entity/User";
+import 'reflect-metadata';
+import { createConnection } from 'typeorm';
+import express, { Application } from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import morgan from 'morgan';
+import taskRoutes from './routes/tasks';
+import authRoutes from './routes/auth';
+import categoryRoutes from './routes/categories';
 
-createConnection().then(async connection => {
+dotenv.config();
 
-    console.log("Inserting a new user into the database...");
-    const user = new User();
-    user.firstName = "Timber";
-    user.lastName = "Saw";
-    user.age = 25;
-    await connection.manager.save(user);
-    console.log("Saved a new user with id: " + user.id);
+try {
+  createConnection();
+} catch (err) {
+  console.error(err);
+}
 
-    console.log("Loading users from the database...");
-    const users = await connection.manager.find(User);
-    console.log("Loaded users: ", users);
+const app: Application = express();
 
-    console.log("Here you can setup and run express/koa/any other framework.");
+const PORT = process.env.PORT || 5000;
 
-}).catch(error => console.log(error));
+app.use(express.json());
+app.use(cors());
+app.use(morgan('dev'));
+
+// Routes
+app.use('/api/v1/tasks', taskRoutes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/categories', categoryRoutes);
+
+app.listen(PORT, () => console.log(`server started on port ${PORT}`));
