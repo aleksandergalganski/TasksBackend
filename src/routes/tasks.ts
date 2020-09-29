@@ -15,6 +15,7 @@ router
   .route('/')
   .get(checkJwt, getTasks)
   .post(checkJwt, taskValidationRules(), validate, createTask);
+
 router
   .route('/:id')
   .get(checkJwt, getTask)
