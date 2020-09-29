@@ -3,6 +3,7 @@
 ## Technologies
 
 - TypeScript
+- NodeJS
 - PostgreSQL
 - ExpressJS
 - TypeORM
