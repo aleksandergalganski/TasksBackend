@@ -10,21 +10,19 @@ export const getTasks = async (req: Request, res: Response): Promise<Response> =
     let tasks: Task[];
     const userId = req.user.id;
 
-    if (req.query.category) {
-      const categoryId = +req.query.category;
+    if (req.query.type) {
+      const type = req.query.type;
 
       tasks = await getRepository(Task)
         .createQueryBuilder('task')
         .leftJoin('task.user', 'user')
-        .leftJoin('task.category', 'category')
         .where('user.id = :userId', { userId })
-        .andWhere('category.id = :categoryId', { categoryId })
+        .andWhere('task.type = :type', { type })
         .getMany();
     } else {
       tasks = await getRepository(Task)
         .createQueryBuilder('task')
         .leftJoin('task.user', 'user')
-        .leftJoinAndSelect('task.category', 'category')
         .where('task.user.id = :userId', { userId })
         .orderBy('task.createdAt', 'DESC')
         .getMany();
@@ -37,64 +35,97 @@ export const getTasks = async (req: Request, res: Response): Promise<Response> =
 };
 
 export const getTask = async (req: Request, res: Response): Promise<Response> => {
-  const task = await getRepository(Task).findOne(req.params.id);
+  try {
+    const task = await getRepository(Task).findOne(req.params.id);
 
-  if (task.user.id !== req.user.id) {
-    return res.status(401).json({ message: 'Not authorized to get this task' });
+    if (!task) {
+      return res
+        .status(404)
+        .json({ message: `Not found Task with the id of ${req.params.id}` });
+    }
+
+    if (task.user.id !== req.user.id) {
+      return res.status(401).json({ message: 'Not authorized to get this task' });
+    }
+
+    return res.status(200).json({ data: task });
+  } catch (err) {
+    return res.status(500).json({ message: 'Server error' });
   }
-
-  return res.status(200).json({ data: task });
 };
 
 export const createTask = async (req: Request, res: Response): Promise<Response> => {
-  const category = await getRepository(Category).findOne(req.body.categoryId);
+  try {
+    const category = await getRepository(Category).findOne(req.body.categoryId);
 
-  if (!category) {
-    return res
-      .status(404)
-      .json({ message: `Not found category with the id of ${req.body.categoryId}` });
+    if (!category) {
+      return res
+        .status(404)
+        .json({ message: `Not found category with the id of ${req.body.categoryId}` });
+    }
+
+    req.body.category = category;
+
+    const user = await getRepository(User).findOne(req.user.id);
+    req.body.user = user;
+
+    let task: any = getRepository(Task).create(req.body);
+    task = await getRepository(Task).save(task);
+
+    return res.status(201).json({
+      data: {
+        name: task.name,
+        id: task.id,
+        createdAt: task.createdAt,
+        isActive: task.isActive,
+        type: task.type
+      }
+    });
+  } catch (err) {
+    return res.status(500).json({ message: 'Server Error' });
   }
-
-  req.body.category = category;
-
-  const user = await getRepository(User).findOne(req.user.id);
-  req.body.user = user;
-
-  let task = getRepository(Task).create(req.body);
-  task = await getRepository(Task).save(task);
-  return res.status(201).json({ data: task });
 };
 
 export const updateTask = async (req: Request, res: Response): Promise<Response> => {
-  let task = await getRepository(Task).findOne(req.params.id, { relations: ['user'] });
+  try {
+    let task = await getRepository(Task).findOne(req.params.id, { relations: ['user'] });
 
-  if (!task) {
-    return res
-      .status(404)
-      .json({ message: `Not found Task with the id of ${req.params.id}` });
-  }
-  if (task.user.id !== req.user.id) {
-    return res.status(404).json({ message: 'Not authorized' });
-  }
+    if (!task) {
+      return res
+        .status(404)
+        .json({ message: `Not found Task with the id of ${req.params.id}` });
+    }
+    if (task.user.id !== req.user.id) {
+      return res.status(404).json({ message: 'Not authorized' });
+    }
 
-  getRepository(Task).merge(task, req.body);
-  task = await getRepository(Task).save(task);
-  return res.status(201).json({ data: task });
+    getRepository(Task).merge(task, req.body);
+    task = await getRepository(Task).save(task);
+    return res.status(201).json({ data: task });
+  } catch (err) {
+    return res.status(500).json({ message: 'Server Error' });
+  }
 };
 
 export const deleteTask = async (req: Request, res: Response): Promise<Response> => {
-  const task = await getRepository(Task).findOne(req.params.id, { relations: ['user'] });
+  try {
+    const task = await getRepository(Task).findOne(req.params.id, {
+      relations: ['user']
+    });
 
-  if (!task) {
-    return res
-      .status(404)
-      .json({ message: `Not found Task with the id of ${req.params.id}` });
+    if (!task) {
+      return res
+        .status(404)
+        .json({ message: `Not found Task with the id of ${req.params.id}` });
+    }
+
+    if (task.user.id !== req.user.id) {
+      return res.status(404).json({ message: 'Not authorized' });
+    }
+
+    await getRepository(Task).delete(req.params.id);
+    return res.status(200).json({ data: {} });
+  } catch (err) {
+    return res.status(500).json({ message: 'Server Error' });
   }
-
-  if (task.user.id !== req.user.id) {
-    return res.status(404).json({ message: 'Not authorized' });
-  }
-
-  await getRepository(Task).delete(req.params.id);
-  return res.status(200).json({ data: {} });
 };

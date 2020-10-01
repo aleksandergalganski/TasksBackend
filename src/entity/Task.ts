@@ -2,6 +2,12 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Category } from './Category';
 import { User } from './User';
 
+enum TaskType {
+  TODO = 'todo',
+  RUNNING = 'running',
+  FINISHED = 'finished'
+}
+
 @Entity({ name: 'tasks' })
 export class Task {
   @PrimaryGeneratedColumn()
@@ -15,6 +21,9 @@ export class Task {
 
   @Column({ default: true })
   isActive: boolean;
+
+  @Column({ type: 'enum', enum: TaskType })
+  type: TaskType;
 
   @ManyToOne(type => User, user => user.tasks)
   user: User;
