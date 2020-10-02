@@ -3,6 +3,7 @@
 ## Technologies
 
 - TypeScript
+- NodeJS
 - PostgreSQL
 - ExpressJS
 - TypeORM
@@ -14,7 +15,7 @@
 3. Create .env file and add (JWT_SECRET, PORT)
 4. `npm run dev`
 
-## Steps to deploy this project
+## Steps to build this project
 
 1. `npm run build`
 2. `npm run start`
