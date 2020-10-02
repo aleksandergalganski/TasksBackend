@@ -1,5 +1,4 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { Category } from './Category';
 import { User } from './User';
 
 enum TaskType {
@@ -27,7 +26,4 @@ export class Task {
 
   @ManyToOne(type => User, user => user.tasks)
   user: User;
-
-  @ManyToOne(type => Category, category => category.tasks)
-  category: Category;
 }

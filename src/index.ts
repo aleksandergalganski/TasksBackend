@@ -6,7 +6,6 @@ import cors from 'cors';
 import morgan from 'morgan';
 import taskRoutes from './routes/tasks';
 import authRoutes from './routes/auth';
-import categoryRoutes from './routes/categories';
 
 dotenv.config();
 
@@ -27,6 +26,5 @@ app.use(morgan('dev'));
 // Routes
 app.use('/api/v1/tasks', taskRoutes);
 app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/categories', categoryRoutes);
 
 app.listen(PORT, () => console.log(`server started on port ${PORT}`));

@@ -1,7 +1,5 @@
 import { Request, Response } from 'express';
-import { chownSync } from 'fs';
 import { getRepository } from 'typeorm';
-import { Category } from '../entity/Category';
 import { Task } from '../entity/Task';
 import { User } from '../entity/User';
 
@@ -56,16 +54,6 @@ export const getTask = async (req: Request, res: Response): Promise<Response> =>
 
 export const createTask = async (req: Request, res: Response): Promise<Response> => {
   try {
-    const category = await getRepository(Category).findOne(req.body.categoryId);
-
-    if (!category) {
-      return res
-        .status(404)
-        .json({ message: `Not found category with the id of ${req.body.categoryId}` });
-    }
-
-    req.body.category = category;
-
     const user = await getRepository(User).findOne(req.user.id);
     req.body.user = user;
 
