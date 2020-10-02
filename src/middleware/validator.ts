@@ -3,7 +3,7 @@ import { check, validationResult } from 'express-validator';
 
 export const taskValidationRules = () => [
   check('name', 'Please add a name').notEmpty(),
-  check('categoryId', 'Please add category Id').notEmpty()
+  check('type', 'Please add a type').notEmpty()
 ];
 
 export const userValidationRules = () => [

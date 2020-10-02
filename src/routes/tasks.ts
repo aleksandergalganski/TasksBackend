@@ -19,7 +19,7 @@ router
 router
   .route('/:id')
   .get(checkJwt, getTask)
-  .put(checkJwt, taskValidationRules(), validate, updateTask)
+  .put(checkJwt, updateTask)
   .delete(checkJwt, deleteTask);
 
 export default router;
