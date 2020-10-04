@@ -1,19 +1,15 @@
 import 'reflect-metadata';
-import { createConnection } from 'typeorm';
 import express, { Application } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import morgan from 'morgan';
+import connectDB from './config/db';
 import taskRoutes from './routes/tasks';
 import authRoutes from './routes/auth';
 
 dotenv.config();
 
-try {
-  createConnection();
-} catch (err) {
-  console.error(err);
-}
+connectDB();
 
 const app: Application = express();
 
