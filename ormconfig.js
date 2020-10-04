@@ -3,7 +3,7 @@ module.exports = {
   url: process.env.DB_URL,
   synchronize: true,
   logging: false,
-  entities: [__dirname + '/dist/src/entity/**/*.js'],
+  entities: ['dist/entity/*.js'],
   migrations: ['dist/src/migration/**/*.js'],
   subscribers: ['dist/src/subscriber/**/*.js'],
   cli: {
