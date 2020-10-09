@@ -7,10 +7,11 @@ import {
   deleteTask
 } from '../controllers/tasks';
 import { checkJwt } from '../middleware/auth';
+import validate, { taskValidationRules } from '../middleware/validator';
 
 const router = Router();
 
-router.route('/').get(checkJwt, getTasks).post(checkJwt, createTask);
+router.route('/').get(checkJwt, getTasks).post(checkJwt, taskValidationRules(), validate, createTask);
 
 router
   .route('/:id')
